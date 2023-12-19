@@ -25,7 +25,7 @@ def fetch(url: str, save_path: str):
             )
 
             # Scroll to bottom
-            for i in range(50):
+            for i in range(100):
                 driver.execute_script("scrollBy(0,500)")
                 time.sleep(0.05)
 
