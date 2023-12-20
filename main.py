@@ -16,6 +16,15 @@ def run_next(keyword: str, html_path: str, save_dir: str, threads: int):
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir, exist_ok=True)
+    else:
+        shutil.rmtree(save_dir, ignore_errors=True)
+        os.makedirs(save_dir, exist_ok=True)
+
+    if not os.path.exists(f'{save_dir}/{keyword}'):
+        os.makedirs(f'{save_dir}/{keyword}', exist_ok=True)
+    else:
+        shutil.rmtree(f'{save_dir}/{keyword}', ignore_errors=True)
+        os.makedirs(f'{save_dir}/{keyword}', exist_ok=True)
 
     # Get all htmls
     htmls = [os.path.join(html_path, html) for html in os.listdir(html_path)]
@@ -45,7 +54,7 @@ def run_next(keyword: str, html_path: str, save_dir: str, threads: int):
         # Download
         st.write(f'Đang download tổng cộng {len(all_urls)} ảnh ...')
         with ThreadPoolExecutor(max_workers=int(threads)) as executor:
-            futures = [executor.submit(download, url, save_dir) for url in all_urls]
+            futures = [executor.submit(download, url, f'{save_dir}/{keyword}') for url in all_urls]
 
             for future in as_completed(futures):
                 result = future.result()
@@ -60,7 +69,7 @@ def run_next(keyword: str, html_path: str, save_dir: str, threads: int):
         datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
         with zipfile.ZipFile(f'zip/{keyword}_{datetime_now}.zip', 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            for root, dirs, files in os.walk(save_dir):
+            for root, dirs, files in os.walk(f'{save_dir}/{keyword}'):
                 for file in files:
                     zip_file.write(os.path.join(root, file), arcname=file)
 
